@@ -3,40 +3,130 @@ package entity;
 import main.GamePanel;
 import main.KeyHandler;
 
+import javax.imageio.ImageIO;
 import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 import java.util.Random;
 
 public class Player extends Entity {
     GamePanel panel;
     KeyHandler kH;
+    boolean movementKeyPressed = false;
+
+    public final int screenX;
+    public final int screenY;
+
+    public boolean canMove = true;
     public Player(GamePanel panel, KeyHandler kH) {
         this.panel = panel;
         this.kH = kH;
+
+        screenX = panel.screenWidth/2 - (panel.tileSize/2);
+        screenY = panel.screenHeight/2 - (panel.tileSize/2);
+
+        collisionBox = new Rectangle(16, 12, panel.tileSize-32, panel.tileSize-32);
+
         setDefaultMovementStats();
+        getPlayerImage();
     }
+
     public void setDefaultMovementStats() {
-        Random r = new Random();
-        posX = r.nextInt(0,300);
-        posY = 100;
-        speedX = 3;
-        speedY = 3;
+        posX = 10 * panel.tileSize;
+        posY = 10 * panel.tileSize;
+        speed = 5;
+        direction = "down";
     }
+
     public void update() {
         movementHandler();
+        collisionHandler();
+        spriteHandler();
     }
+
     public void movementHandler() {
-        if(kH.upPressed) {
-            posY -= speedY;
-        }else if(kH.downPressed) {
-            posY += speedY;
-        }else if(kH.leftPressed) {
-            posX -= speedX;
-        }else if(kH.rightPressed) {
-            posX += speedX;
+        movementKeyPressed = kH.upPressed || kH.downPressed || kH.leftPressed || kH.rightPressed;
+        if(canMove) {
+            if (kH.upPressed) {
+                direction = "up";
+                posY -= speed;
+            } else if (kH.downPressed) {
+                direction = "down";
+                posY += speed;
+            } else if (kH.leftPressed) {
+                direction = "left";
+                posX -= speed;
+            } else if (kH.rightPressed) {
+                direction = "right";
+                posX += speed;
+            }
+        }
+    }
+    public void spriteHandler() {
+        if(movementKeyPressed){
+            spriteCounter++;
+        }else {
+            spriteNum = 0;
+        }
+        if(spriteCounter > 10-speed/2) {
+            spriteCounter = 0;
+            if(spriteNum >= down.length-1){
+                spriteNum = 0;
+            }else {
+                spriteNum++;
+            }
+        }
+    }
+    public void collisionHandler() {
+        collisionOn = false;
+        panel.cHandler.checkTile(this);
+        if(collisionOn) {
+            canMove = false;
+            switch (direction) {
+                case "up":
+                    posY = (posY/panel.tileSize + 1) * panel.tileSize - collisionBox.y + 5;
+                    break;
+                case "down":
+                    posY = (posY/panel.tileSize + 1) * panel.tileSize - collisionBox.y - collisionBox.height - 5;
+                    break;
+                case "left":
+                    posX = (posX/panel.tileSize + 1) * panel.tileSize - collisionBox.x + 5;
+                    break;
+                case "right":
+                    posX = (posX/panel.tileSize + 1) * panel.tileSize - collisionBox.x - collisionBox.width - 5;
+                    break;
+            }
+        }else {canMove = true;}
+    }
+    public void getPlayerImage() {
+        try {
+            up = new BufferedImage[]{ImageIO.read(getClass().getResourceAsStream("/player/playerUp_0.png")), ImageIO.read(getClass().getResourceAsStream("/player/playerUp_1.png")), ImageIO.read(getClass().getResourceAsStream("/player/playerUp_2.png"))};
+            down = new BufferedImage[]{ImageIO.read(getClass().getResourceAsStream("/player/playerDown_0.png")),ImageIO.read(getClass().getResourceAsStream("/player/playerDown_1.png")),ImageIO.read(getClass().getResourceAsStream("/player/playerDown_2.png"))};
+            left = new BufferedImage[]{ImageIO.read(getClass().getResourceAsStream("/player/playerLeft_0.png")),ImageIO.read(getClass().getResourceAsStream("/player/playerLeft_1.png")),ImageIO.read(getClass().getResourceAsStream("/player/playerLeft_2.png"))};
+            right = new BufferedImage[]{ImageIO.read(getClass().getResourceAsStream("/player/playerRight_0.png")),ImageIO.read(getClass().getResourceAsStream("/player/playerRight_1.png")),ImageIO.read(getClass().getResourceAsStream("/player/playerRight_2.png"))};
+
+        }catch(IOException e){
+            e.printStackTrace();
         }
     }
     public void draw(Graphics2D g2d) {
-        g2d.setColor(Color.black);
-        g2d.fillRect(posX, posY, panel.tileSize, panel.tileSize);
+        BufferedImage playerImage = null;
+        switch (direction) {
+            case "up":
+                playerImage = up[spriteNum];
+                break;
+            case "down":
+                playerImage = down[spriteNum];
+                break;
+            case "left":
+                playerImage = left[spriteNum];
+                break;
+            case "right":
+                playerImage = right[spriteNum];
+                break;
+
+        }
+        g2d.drawImage(playerImage, screenX, screenY, panel.tileSize, panel.tileSize, null);
     }
 }

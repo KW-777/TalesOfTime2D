@@ -1,6 +1,7 @@
 package main;
 
 import entity.Player;
+import tile.TileManager;
 
 import javax.swing.*;
 import java.awt.*;
@@ -10,20 +11,29 @@ public class GamePanel extends JPanel implements Runnable {
     final int originalTileSize = 16;
     final int scale = 4;
     public final int tileSize = originalTileSize * scale; // Default: 64px
-    final int maxScreenCol = 16;
-    final int maxScreenRow = 12;
-    final int screenWidth = tileSize * maxScreenCol; // Default: 1024px
-    final int screenHeight = tileSize * maxScreenRow; // Default: 768px
+    public final int maxScreenCol = 16;
+    public final int maxScreenRow = 12;
+    public final int screenWidth = tileSize * maxScreenCol; // Default: 1024px
+    public final int screenHeight = tileSize * maxScreenRow; // Default: 768px
 
+    //World Settings
+    public final int maxWorldCol = 28;
+    public final int maxWorldRow = 12;
+    public final int worldWidth = tileSize * maxWorldCol;
+    public final int worldHeight = tileSize * maxWorldRow;
     //Thread Settings
     Thread gameThread;
     KeyHandler keyH = new KeyHandler();
-    Player player = new Player(this,keyH);
+    TileManager tm = new TileManager(this);
+    public CollisionHandler cHandler = new CollisionHandler(this);
+
+    public Player player = new Player(this,keyH);
+
     final int FPS = 60;
 
     public GamePanel() {
         this.setPreferredSize(new Dimension(screenWidth, screenHeight));
-        this.setBackground(Color.blue);
+        this.setBackground(Color.black);
         this.setDoubleBuffered(true);
         this.addKeyListener(keyH);
         this.setFocusable(true);
@@ -66,6 +76,7 @@ public class GamePanel extends JPanel implements Runnable {
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
         Graphics2D g2d = (Graphics2D)g;
+        tm.draw(g2d);
         player.draw(g2d);
 
         g2d.dispose();
