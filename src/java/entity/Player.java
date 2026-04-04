@@ -37,7 +37,7 @@ public class Player extends Entity {
     public void setDefaultMovementStats() {
         posX = 10 * panel.tileSize;
         posY = 10 * panel.tileSize;
-        speed = 5;
+        speed = 5 * 60/panel.FPS;
         direction = "down";
     }
 
@@ -75,7 +75,7 @@ public class Player extends Entity {
         }else {
             spriteNum = 0;
         }
-        if(spriteCounter > 10-speed/2) {
+        if(spriteCounter > (panel.FPS/30)*8) {
             spriteCounter = 0;
             if(spriteNum >= down.length-1){
                 spriteNum = 0;
