@@ -31,7 +31,6 @@ public class CollisionHandler {
                 tileNum2 = panel.tm.currentMapTiles[entityRightCol][entityTopRow];
                 if (panel.tm.tileSet[tileNum1].collision || panel.tm.tileSet[tileNum2].collision) {
                     entity.collisionOn = true;
-                    collisionSide = "up";
                 }
             }case "down" -> {
                 entityBottomRow = (entityBWY - 2 +entity.speed) / panel.tileSize;
@@ -39,7 +38,6 @@ public class CollisionHandler {
                 tileNum2 = panel.tm.currentMapTiles[entityRightCol][entityBottomRow];
                 if (panel.tm.tileSet[tileNum1].collision || panel.tm.tileSet[tileNum2].collision) {
                     entity.collisionOn = true;
-                    collisionSide = "down";
                 }
             }case "left" -> {
                 entityLeftCol = (entityLWX - 2 +entity.speed) / panel.tileSize;
@@ -47,7 +45,6 @@ public class CollisionHandler {
                 tileNum2 = panel.tm.currentMapTiles[entityLeftCol][entityBottomRow];
                 if (panel.tm.tileSet[tileNum1].collision || panel.tm.tileSet[tileNum2].collision) {
                     entity.collisionOn = true;
-                    collisionSide = "left";
                 }
             }case "right" -> {
                 entityRightCol = (entityRWX - 2 +entity.speed) / panel.tileSize;
@@ -55,7 +52,6 @@ public class CollisionHandler {
                 tileNum2 = panel.tm.currentMapTiles[entityRightCol][entityBottomRow];
                 if (panel.tm.tileSet[tileNum1].collision || panel.tm.tileSet[tileNum2].collision) {
                     entity.collisionOn = true;
-                    collisionSide = "right";
                 }
             }
         }

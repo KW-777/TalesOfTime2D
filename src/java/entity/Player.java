@@ -18,6 +18,8 @@ public class Player extends Entity {
     public final int screenX;
     public final int screenY;
 
+    public boolean byBorder = false;
+
     public boolean canMove = true;
     public Player(GamePanel panel, KeyHandler kH) {
         this.panel = panel;
@@ -26,7 +28,7 @@ public class Player extends Entity {
         screenX = panel.screenWidth/2 - (panel.tileSize/2);
         screenY = panel.screenHeight/2 - (panel.tileSize/2);
 
-        collisionBox = new Rectangle(16, 12, panel.tileSize-32, panel.tileSize-32);
+        collisionBox = new Rectangle(16, 12, panel.tileSize-48, panel.tileSize-32);
 
         setDefaultMovementStats();
         getPlayerImage();
@@ -47,6 +49,10 @@ public class Player extends Entity {
 
     public void movementHandler() {
         movementKeyPressed = kH.upPressed || kH.downPressed || kH.leftPressed || kH.rightPressed;
+        byBorder = posX < 8* panel.tileSize ||
+                posX > panel.tm.currentWorldCols * panel.tileSize - 8 * panel.tileSize
+                || posY < 6 * panel.tileSize
+                || posY > panel.tm.currentWorldCols * panel.tileSize - 6*panel.tileSize;
         if(canMove) {
             if (kH.upPressed) {
                 direction = "up";
