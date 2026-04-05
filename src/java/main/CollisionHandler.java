@@ -17,43 +17,49 @@ public class CollisionHandler {
         int entityBWY = entity.posY + entity.collisionBox.y + entity.collisionBox.height;
 
 
-        int entityLeftCol = entityLWX/panel.tileSize;
-        int entityRightCol = entityRWX/panel.tileSize;
-        int entityTopRow = entityTWY/panel.tileSize;
-        int entityBottomRow = entityBWY/panel.tileSize;
+        int entityLeftCol = entityLWX / panel.tileSize;
+        int entityRightCol = entityRWX / panel.tileSize;
+        int entityTopRow = entityTWY / panel.tileSize;
+        int entityBottomRow = entityBWY / panel.tileSize;
 
-        int tileNum1,tileNum2;
+        int checkRadius = entity.isMoving ? entity.speed :0;
 
-        switch(entity.direction) {
+        switch (entity.direction) {
             case "up" -> {
-                entityTopRow = (entityTWY - 2+entity.speed) / panel.tileSize;
-                tileNum1 = panel.tm.currentMapTiles[entityLeftCol][entityTopRow];
-                tileNum2 = panel.tm.currentMapTiles[entityRightCol][entityTopRow];
-                if (panel.tm.tileSet[tileNum1].collision || panel.tm.tileSet[tileNum2].collision) {
-                    entity.collisionOn = true;
+                entityTopRow = (entityTWY - checkRadius) / panel.tileSize;
+                for (int col = entityLeftCol; col <= entityRightCol; col++) {
+                    if(panel.tm.isSolid(col,entityTopRow)) {
+                        entity.collisionOn = true;
+                        break;
+                    }
                 }
-            }case "down" -> {
-                entityBottomRow = (entityBWY - 2 +entity.speed) / panel.tileSize;
-                tileNum1 = panel.tm.currentMapTiles[entityLeftCol][entityBottomRow];
-                tileNum2 = panel.tm.currentMapTiles[entityRightCol][entityBottomRow];
-                if (panel.tm.tileSet[tileNum1].collision || panel.tm.tileSet[tileNum2].collision) {
-                    entity.collisionOn = true;
+            }
+            case "down" -> {
+                entityBottomRow = (entityBWY + checkRadius) / panel.tileSize;
+                for (int col = entityLeftCol; col <= entityRightCol; col++) {
+                    if (panel.tm.isSolid(col,entityBottomRow)) {
+                        entity.collisionOn = true;
+                        break;
+                    }
                 }
-            }case "left" -> {
-                entityLeftCol = (entityLWX - 2 +entity.speed) / panel.tileSize;
-                tileNum1 = panel.tm.currentMapTiles[entityLeftCol][entityTopRow];
-                tileNum2 = panel.tm.currentMapTiles[entityLeftCol][entityBottomRow];
-                if (panel.tm.tileSet[tileNum1].collision || panel.tm.tileSet[tileNum2].collision) {
-                    entity.collisionOn = true;
+            }
+            case "left" -> {
+                entityLeftCol = (entityLWX - checkRadius) / panel.tileSize;
+                for (int row = entityTopRow; row <= entityBottomRow; row++) {
+                    if (panel.tm.isSolid(entityLeftCol,row)) {
+                        entity.collisionOn = true;
+                        break;
+                    }
                 }
-            }case "right" -> {
-                entityRightCol = (entityRWX - 2 +entity.speed) / panel.tileSize;
-                tileNum1 = panel.tm.currentMapTiles[entityRightCol][entityTopRow];
-                tileNum2 = panel.tm.currentMapTiles[entityRightCol][entityBottomRow];
-                if (panel.tm.tileSet[tileNum1].collision || panel.tm.tileSet[tileNum2].collision) {
-                    entity.collisionOn = true;
+            }
+            case "right" -> {
+                entityRightCol = (entityRWX + checkRadius) / panel.tileSize;
+                for (int row = entityTopRow; row <= entityBottomRow; row++) {
+                    if (panel.tm.isSolid(entityRightCol,row)) {
+                        entity.collisionOn = true;
+                        break;
+                    }
                 }
             }
         }
-    }
-}
+    }}

@@ -125,24 +125,14 @@ public class TileManager {
                 j++;
             }
             currentWorldRows = j;
-            /* while(col < panel.maxWorldCol && row < panel.maxWorldRow){
-               String line = br.readLine();
-               while(col < panel.maxWorldCol) {
-                   String[] numbers = line.split(" ");
-                   int num = Integer.parseInt(numbers[col]);
-                   currentMapTiles[col][row] = num;
-                   col++;
-               }
-               if(col == panel.maxWorldCol) {
-                   col = 0;
-                   row++;
-               }
-            }
-            br.close();
-             */
         }
         catch(Exception e){
             System.err.println(e.getMessage());
         }
+    }
+    public boolean isSolid(int col, int row) {
+        if (col < 0 || row < 0 || col >= currentWorldCols || row >= currentWorldRows)
+            return true; // treat out-of-bounds as solid
+        return tileSet[currentMapTiles[col][row]].collision;
     }
 }

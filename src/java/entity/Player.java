@@ -15,12 +15,11 @@ public class Player extends Entity {
     KeyHandler kH;
     boolean movementKeyPressed = false;
 
-    public final int screenX;
-    public final int screenY;
+    public final int screenX,screenY;
+
 
     public boolean byBorder = false;
 
-    public boolean canMove = true;
     public Player(GamePanel panel, KeyHandler kH) {
         this.panel = panel;
         this.kH = kH;
@@ -28,7 +27,7 @@ public class Player extends Entity {
         screenX = panel.screenWidth/2 - (panel.tileSize/2);
         screenY = panel.screenHeight/2 - (panel.tileSize/2);
 
-        collisionBox = new Rectangle(16, 12, panel.tileSize-48, panel.tileSize-32);
+        collisionBox = new Rectangle(16, 12, panel.tileSize-32, panel.tileSize-32);
 
         setDefaultMovementStats();
         getPlayerImage();
@@ -43,67 +42,50 @@ public class Player extends Entity {
 
     public void update() {
         movementHandler();
-        collisionHandler();
+        super.collisionHandler(panel);
         spriteHandler();
     }
 
     public void movementHandler() {
+        isMoving = false;
         movementKeyPressed = kH.upPressed || kH.downPressed || kH.leftPressed || kH.rightPressed;
         byBorder = posX < 8* panel.tileSize ||
                 posX > panel.tm.currentWorldCols * panel.tileSize - 8 * panel.tileSize
                 || posY < 6 * panel.tileSize
                 || posY > panel.tm.currentWorldCols * panel.tileSize - 6*panel.tileSize;
-        if(canMove) {
             if (kH.upPressed) {
+                lastPosY = posY;
                 direction = "up";
                 posY -= speed;
             } else if (kH.downPressed) {
+                lastPosY = posY;
                 direction = "down";
                 posY += speed;
             } else if (kH.leftPressed) {
+                lastPosX = posX;
                 direction = "left";
                 posX -= speed;
             } else if (kH.rightPressed) {
+                lastPosX = posX;
                 direction = "right";
                 posX += speed;
             }
-        }
+            isMoving = true;
     }
     public void spriteHandler() {
-        if(movementKeyPressed){
-            spriteCounter++;
-        }else {
-            spriteNum = 0;
-        }
-        if(spriteCounter > (panel.FPS/30)*8) {
-            spriteCounter = 0;
-            if(spriteNum >= down.length-1){
+            if (movementKeyPressed) {
+                spriteCounter++;
+            } else {
                 spriteNum = 0;
-            }else {
-                spriteNum++;
             }
-        }
-    }
-    public void collisionHandler() {
-        collisionOn = false;
-        panel.cHandler.checkTile(this);
-        if(collisionOn) {
-            canMove = false;
-            switch (direction) {
-                case "up":
-                    posY = (posY/panel.tileSize + 1) * panel.tileSize - collisionBox.y + 5;
-                    break;
-                case "down":
-                    posY = (posY/panel.tileSize + 1) * panel.tileSize - collisionBox.y - collisionBox.height - 5;
-                    break;
-                case "left":
-                    posX = (posX/panel.tileSize + 1) * panel.tileSize - collisionBox.x + 5;
-                    break;
-                case "right":
-                    posX = (posX/panel.tileSize + 1) * panel.tileSize - collisionBox.x - collisionBox.width - 5;
-                    break;
+            if (spriteCounter > (panel.FPS / 30) * 8) {
+                spriteCounter = 0;
+                if (spriteNum >= down.length - 1) {
+                    spriteNum = 0;
+                } else {
+                    spriteNum++;
+                }
             }
-        }else {canMove = true;}
     }
     public void getPlayerImage() {
         try {
