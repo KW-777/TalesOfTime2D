@@ -28,36 +28,44 @@ public class CollisionHandler {
             case "up" -> {
                 entityTopRow = (entityTWY - checkRadius) / panel.tileSize;
                 for (int col = entityLeftCol; col <= entityRightCol; col++) {
-                    if(panel.tm.isSolid(col,entityTopRow)) {
-                        entity.collisionOn = true;
-                        break;
+                    for(int layer = 0; layer < panel.tm.currentWorldLayers; layer++) {
+                        if(panel.tm.isSolid(layer,col,entityTopRow)) {
+                            entity.collisionOn = true;
+                            break;
+                        }
                     }
                 }
             }
             case "down" -> {
                 entityBottomRow = (entityBWY + checkRadius) / panel.tileSize;
                 for (int col = entityLeftCol; col <= entityRightCol; col++) {
-                    if (panel.tm.isSolid(col,entityBottomRow)) {
-                        entity.collisionOn = true;
-                        break;
+                    for(int layer = 0; layer < panel.tm.currentWorldLayers; layer++) {
+                        if (panel.tm.isSolid(layer, col, entityBottomRow)) {
+                            entity.collisionOn = true;
+                            break;
+                        }
                     }
                 }
             }
             case "left" -> {
                 entityLeftCol = (entityLWX - checkRadius) / panel.tileSize;
                 for (int row = entityTopRow; row <= entityBottomRow; row++) {
-                    if (panel.tm.isSolid(entityLeftCol,row)) {
-                        entity.collisionOn = true;
-                        break;
+                    for(int layer = 0; layer < panel.tm.currentWorldLayers; layer++) {
+                        if (panel.tm.isSolid(layer, entityLeftCol,row)) {
+                            entity.collisionOn = true;
+                            break;
+                        }
                     }
                 }
             }
             case "right" -> {
                 entityRightCol = (entityRWX + checkRadius) / panel.tileSize;
                 for (int row = entityTopRow; row <= entityBottomRow; row++) {
-                    if (panel.tm.isSolid(entityRightCol,row)) {
-                        entity.collisionOn = true;
-                        break;
+                    for(int layer = 0; layer < panel.tm.currentWorldLayers; layer++) {
+                        if (panel.tm.isSolid(layer,entityRightCol,row)) {
+                            entity.collisionOn = true;
+                            break;
+                        }
                     }
                 }
             }

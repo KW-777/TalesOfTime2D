@@ -1,6 +1,8 @@
 package tile;
 
+import jdk.jshell.execution.Util;
 import main.GamePanel;
+import main.UtilityTool;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -13,101 +15,104 @@ import java.util.ArrayList;
 public class TileManager {
     GamePanel panel;
     public Tile[] tileSet;
-    public int[][] currentMapTiles;
+    public int[][][] currentMapTiles;
 
     public int currentWorldRows;
     public int currentWorldCols;
+    public int currentWorldLayers;
 
     public TileManager(GamePanel panel){
         this.panel = panel;
-        currentMapTiles = new int [panel.maxWorldCol+1][panel.maxWorldRow+1];
+        currentMapTiles = new int [8][panel.maxWorldCol+1][panel.maxWorldRow+1];
         tileSet = new Tile[32];
 
         getTileImage();
-        loadMap("/maps/map01.map");
+        loadMap("/maps/mapBase01.map");
+        loadMap("/maps/mapNature01.map");
     }
     public void getTileImage() {
         try {
-            tileSet[0] = new Tile();
-            tileSet[0].sprite = ImageIO.read(getClass().getResourceAsStream("/tiles/grass0.png"));
-            tileSet[1] = new Tile();
-            tileSet[1].sprite = ImageIO.read(getClass().getResourceAsStream("/tiles/water0.png"));
-            tileSet[2] = new Tile();
-            tileSet[2].sprite = ImageIO.read(getClass().getResourceAsStream("/tiles/waterGTL0.png"));
-            tileSet[2].collision = true;
-            tileSet[3] = new Tile();
-            tileSet[3].sprite = ImageIO.read(getClass().getResourceAsStream("/tiles/waterGTM0.png"));
-            tileSet[3].collision = true;
-            tileSet[4] = new Tile();
-            tileSet[4].sprite = ImageIO.read(getClass().getResourceAsStream("/tiles/waterGTR0.png"));
-            tileSet[4].collision = true;
-            tileSet[5] = new Tile();
-            tileSet[5].sprite = ImageIO.read(getClass().getResourceAsStream("/tiles/waterGML0.png"));
-            tileSet[5].collision = true;
-            tileSet[6] = new Tile();
-            tileSet[6].sprite = ImageIO.read(getClass().getResourceAsStream("/tiles/waterGMR0.png"));
-            tileSet[6].collision = true;
-            tileSet[7] = new Tile();
-            tileSet[7].sprite = ImageIO.read(getClass().getResourceAsStream("/tiles/waterGBL0.png"));
-            tileSet[7].collision = true;
-            tileSet[8] = new Tile();
-            tileSet[8].sprite = ImageIO.read(getClass().getResourceAsStream("/tiles/waterGBM0.png"));
-            tileSet[8].collision = true;
-            tileSet[9] = new Tile();
-            tileSet[9].sprite = ImageIO.read(getClass().getResourceAsStream("/tiles/waterGBR0.png"));
-            tileSet[9].collision = true;
-            tileSet[10] = new Tile();
-            tileSet[10].sprite = ImageIO.read(getClass().getResourceAsStream("/tiles/waterBLC0.png"));
-            tileSet[10].collision = true;
-            tileSet[11] = new Tile();
-            tileSet[11].sprite = ImageIO.read(getClass().getResourceAsStream("/tiles/waterTLC0.png"));
-            tileSet[11].collision = true;
-            tileSet[12] = new Tile();
-            tileSet[12].sprite = ImageIO.read(getClass().getResourceAsStream("/tiles/waterTRC0.png"));
-            tileSet[12].collision = true;
-            tileSet[13] = new Tile();
-            tileSet[13].sprite = ImageIO.read(getClass().getResourceAsStream("/tiles/waterBRC0.png"));
-            tileSet[13].collision = true;
-            tileSet[14] = new Tile();
-            tileSet[14].sprite = ImageIO.read(getClass().getResourceAsStream("/tiles/path0.png"));
-            tileSet[15] = new Tile();
-            tileSet[15].sprite = ImageIO.read(getClass().getResourceAsStream("/tiles/smallAppleTree0.png"));
-            tileSet[15].collision = true;
+            setupTile(0,"grass0",false);
+            setupTile(1,"water0",true);
+            setupTile(2,"waterGTL0",true);
+            setupTile(3,"waterGTM0",true);
+            setupTile(4,"waterGTR0",true);
+            setupTile(5,"waterGML0",true);
+            setupTile(6,"waterGMR0",true);
+            setupTile(7,"waterGBL0",true);
+            setupTile(8,"waterGBM0",true);
+            setupTile(9,"waterGBR0",true);
+            setupTile(10,"waterBLC0",true);
+            setupTile(11,"waterTLC0",true);
+            setupTile(12,"waterTRC0",true);
+            setupTile(13,"waterBRC0",true);
+            setupTile(14,"path0",false);
+            setupTile(15,"smallAppleTree0",true);
+            setupTile(16,"smallGreenTree0",true);
+            setupTile(17,"smallBrownTree0",true);
+            setupTile(18,"blueFlower0",false);
+            setupTile(19,"redFlower0",false);
+            setupTile(20,"purpleFlower0",false);
+            setupTile(21,"redMushroom0",false);
+            setupTile(22,"smallLilypad0",false);
+            setupTile(23,"smallRock0",true);
+            setupTile(24,"bigRock0",true);
+            setupTile(25,"greyWaterRock0",true);
+            setupTile(26,"brownWaterRock0",true);
+            setupTile(27,"woodSign0",true);
+            setupTile(28,"smallChestClosed0",true);
+            setupTile(29,"smallChestOpened0",true);
+        }catch(Exception e){
+            System.out.println(e.getMessage());
+        }}
+    public void setupTile(int index,String imagePath,boolean collision){
+        UtilityTool uTool = new UtilityTool();
+        try{
+            tileSet[index] = new Tile();
+            tileSet[index].sprite = uTool.scaleImage(ImageIO.read(getClass().getResourceAsStream("/tiles/"+ imagePath + ".png")),panel.tileSize,panel.tileSize);
+            tileSet[index].collision = collision;
         }catch(IOException e){
             e.printStackTrace();
-        }}
-    public void draw(Graphics2D g2d){
+        }
+    }
+    public void draw(Graphics2D g2d) {
         int worldRow = 0;
         int worldCol = 0;
-        while(worldCol < currentWorldRows && worldRow < currentWorldRows){
+        int tileNum = 0;
+        while (worldCol < currentWorldCols && worldRow < currentWorldRows) {
+            try {
 
-            int tileNum = currentMapTiles[worldCol][worldRow];
+                int worldX = worldCol * panel.tileSize;
+                int worldY = worldRow * panel.tileSize;
+                int screenX = worldX - panel.player.posX + panel.player.screenX;
+                int screenY = worldY - panel.player.posY + panel.player.screenY;
 
-            int worldX = worldCol * panel.tileSize;
-            int worldY = worldRow * panel.tileSize;
-            int screenX = worldX - panel.player.posX + panel.player.screenX;
-            int screenY = worldY - panel.player.posY + panel.player.screenY;
-
-            if(worldX+panel.tileSize > panel.player.posX - panel.player.screenX &&
-                    worldX - panel.tileSize < panel.player.posX + panel.player.screenX &&
-                    worldY+ panel.tileSize > panel.player.posY - panel.player.screenY &&
-                    worldY-panel.tileSize < panel.player.posY + panel.player.screenY){
-                g2d.drawImage(tileSet[tileNum].sprite, screenX, screenY, panel.tileSize, panel.tileSize, null);
-            }
-            worldCol++;
-            if (worldCol == currentWorldCols) {
-                worldCol = 0;
-                worldRow++;
+                if (screenX + panel.tileSize > 0 &&
+                        screenX < panel.screenWidth &&
+                        screenY + panel.tileSize > 0 &&
+                        screenY < panel.screenHeight) {
+                    for (int i = 0; i < currentWorldLayers; i++) {
+                        tileNum = currentMapTiles[i][worldCol][worldRow];
+                        if (tileNum >= 0) {
+                            g2d.drawImage(tileSet[tileNum].sprite, screenX, screenY, null);
+                        }
+                    }
+                }
+                worldCol++;
+                if (worldCol == currentWorldCols) {
+                    worldCol = 0;
+                    worldRow++;
+                }
+            } catch (Exception e) {
+                System.err.println("Error while drawing map: " + e.getMessage());
             }
         }
     }
     public void loadMap(String dir) {
+        currentWorldLayers++;
         try {
             InputStream is = getClass().getResourceAsStream(dir);
             BufferedReader br = new BufferedReader(new InputStreamReader(is));
-
-            //int col = 0;
-            //int row = 0;
 
             ArrayList<String[]> tileData = new ArrayList<>();
 
@@ -116,8 +121,11 @@ public class TileManager {
             int j = 0;
             for(String[] row:tileData) {
                 for(String col:row) {
+                    if(col.equals(".")){ // Check for blanks from tile editor
+                        col = "-1";
+                    }
                     int num = Integer.parseInt(col);
-                    currentMapTiles[i][j] = num;
+                    currentMapTiles[currentWorldLayers-1][i][j] = num;
                     i++;
                 }
                 currentWorldCols = i;
@@ -130,9 +138,12 @@ public class TileManager {
             System.err.println(e.getMessage());
         }
     }
-    public boolean isSolid(int col, int row) {
+    public boolean isSolid(int layer,int col, int row) {
         if (col < 0 || row < 0 || col >= currentWorldCols || row >= currentWorldRows)
             return true; // treat out-of-bounds as solid
-        return tileSet[currentMapTiles[col][row]].collision;
+        if(currentMapTiles[layer][col][row]<0) {return false;}
+        else {
+            return tileSet[currentMapTiles[layer][col][row]].collision;
+        }
     }
 }

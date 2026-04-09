@@ -2,12 +2,14 @@ package entity;
 
 import main.GamePanel;
 import main.KeyHandler;
+import main.UtilityTool;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.Objects;
 import java.util.Random;
 
 public class Player extends Entity {
@@ -15,19 +17,13 @@ public class Player extends Entity {
     KeyHandler kH;
     boolean movementKeyPressed = false;
 
-    public final int screenX,screenY;
-
-
-    public boolean byBorder = false;
+    public int screenX,screenY;
 
     public Player(GamePanel panel, KeyHandler kH) {
         this.panel = panel;
         this.kH = kH;
 
-        screenX = panel.screenWidth/2 - (panel.tileSize/2);
-        screenY = panel.screenHeight/2 - (panel.tileSize/2);
-
-        collisionBox = new Rectangle(16, 12, panel.tileSize-32, panel.tileSize-32);
+        collisionBox = new Rectangle(24, 28, panel.tileSize-42, panel.tileSize-48);
 
         setDefaultMovementStats();
         getPlayerImage();
@@ -44,15 +40,13 @@ public class Player extends Entity {
         movementHandler();
         super.collisionHandler(panel);
         spriteHandler();
+        updateCamera();
+
     }
 
     public void movementHandler() {
         isMoving = false;
         movementKeyPressed = kH.upPressed || kH.downPressed || kH.leftPressed || kH.rightPressed;
-        byBorder = posX < 8* panel.tileSize ||
-                posX > panel.tm.currentWorldCols * panel.tileSize - 8 * panel.tileSize
-                || posY < 6 * panel.tileSize
-                || posY > panel.tm.currentWorldCols * panel.tileSize - 6*panel.tileSize;
             if (kH.upPressed) {
                 lastPosY = posY;
                 direction = "up";
@@ -87,20 +81,52 @@ public class Player extends Entity {
                 }
             }
     }
+    public void updateCamera() {
+        int worldWidth = panel.tm.currentWorldCols * panel.tileSize;
+        int worldHeight = panel.tm.currentWorldRows * panel.tileSize;
+
+        screenX = panel.screenWidth/2 - (panel.tileSize/2);
+        screenY = panel.screenHeight/2 - (panel.tileSize/2);
+        // Lock the screen if near border
+        if(posX < panel.screenWidth/2) {
+            screenX = posX;
+        }
+        if(posX > worldWidth-panel.screenWidth/2) {
+            screenX = panel.screenWidth - (worldWidth-posX);
+        }if(posY < panel.screenHeight/2) {
+            screenY = posY;
+        }if(posY > worldHeight-panel.screenHeight/2) {
+            screenY = panel.screenHeight - (worldHeight-posY);
+        }
+    }
     public void getPlayerImage() {
         try {
-            up = new BufferedImage[]{ImageIO.read(getClass().getResourceAsStream("/player/playerUp_0.png")), ImageIO.read(getClass().getResourceAsStream("/player/playerUp_1.png")), ImageIO.read(getClass().getResourceAsStream("/player/playerUp_2.png"))};
-            down = new BufferedImage[]{ImageIO.read(getClass().getResourceAsStream("/player/playerDown_0.png")),ImageIO.read(getClass().getResourceAsStream("/player/playerDown_1.png")),ImageIO.read(getClass().getResourceAsStream("/player/playerDown_2.png"))};
-            left = new BufferedImage[]{ImageIO.read(getClass().getResourceAsStream("/player/playerLeft_0.png")),ImageIO.read(getClass().getResourceAsStream("/player/playerLeft_1.png")),ImageIO.read(getClass().getResourceAsStream("/player/playerLeft_2.png"))};
-            right = new BufferedImage[]{ImageIO.read(getClass().getResourceAsStream("/player/playerRight_0.png")),ImageIO.read(getClass().getResourceAsStream("/player/playerRight_1.png")),ImageIO.read(getClass().getResourceAsStream("/player/playerRight_2.png"))};
-
-        }catch(IOException e){
+            up = setupSprites("playerUp_0,splayerUp_1,playerUp_2".split(","));
+            down = setupSprites("playerDown_0,playerDown_1,playerDown_2".split(","));
+            left = setupSprites("playerLeft_0,playerLeft_1,playerLeft_2".split(","));
+            right = setupSprites("playerRight_0,playerRight_1,playerRight_2".split(","));
+        }catch(Exception e){
             e.printStackTrace();
         }
+    }
+    public BufferedImage[] setupSprites(String[] imageNames) {
+        UtilityTool uTool = new UtilityTool();
+        BufferedImage[] scaledImages = new BufferedImage[imageNames.length];
+        try {
+            int i = 0;
+            for(String dir:imageNames) {
+                scaledImages[i] = uTool.scaleImage(ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream("/player/" + dir.trim() + ".png"))),panel.tileSize,panel.tileSize);
+                i++;
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return scaledImages;
     }
     public void draw(Graphics2D g2d) {
         BufferedImage playerImage = null;
         switch (direction) {
+            // Choose Directional Sprite
             case "up":
                 playerImage = up[spriteNum];
                 break;
@@ -115,6 +141,6 @@ public class Player extends Entity {
                 break;
 
         }
-        g2d.drawImage(playerImage, screenX, screenY, panel.tileSize, panel.tileSize, null);
+        g2d.drawImage(playerImage, screenX, screenY,null);
     }
 }
