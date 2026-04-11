@@ -10,7 +10,8 @@ public class CollisionHandler {
     public CollisionHandler(GamePanel panel) {
         this.panel = panel;
     }
-    public void checkTile(Entity entity) {
+    public void checkTileCollision(Entity entity) {
+        entity.collisionOn = false;
         int entityLWX = entity.posX + entity.collisionBox.x;
         int entityRWX = entity.posX + entity.collisionBox.x + entity.collisionBox.width;
         int entityTWY = entity.posY + entity.collisionBox.y;
@@ -71,3 +72,4 @@ public class CollisionHandler {
             }
         }
     }}
+

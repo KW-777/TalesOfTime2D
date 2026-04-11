@@ -1,6 +1,7 @@
 package tile;
 
 import jdk.jshell.execution.Util;
+import main.Event;
 import main.GamePanel;
 import main.UtilityTool;
 
@@ -32,45 +33,47 @@ public class TileManager {
     }
     public void getTileImage() {
         try {
-            setupTile(0,"grass0",false);
-            setupTile(1,"water0",true);
-            setupTile(2,"waterGTL0",true);
-            setupTile(3,"waterGTM0",true);
-            setupTile(4,"waterGTR0",true);
-            setupTile(5,"waterGML0",true);
-            setupTile(6,"waterGMR0",true);
-            setupTile(7,"waterGBL0",true);
-            setupTile(8,"waterGBM0",true);
-            setupTile(9,"waterGBR0",true);
-            setupTile(10,"waterBLC0",true);
-            setupTile(11,"waterTLC0",true);
-            setupTile(12,"waterTRC0",true);
-            setupTile(13,"waterBRC0",true);
-            setupTile(14,"path0",false);
-            setupTile(15,"smallAppleTree0",true);
-            setupTile(16,"smallGreenTree0",true);
-            setupTile(17,"smallBrownTree0",true);
-            setupTile(18,"blueFlower0",false);
-            setupTile(19,"redFlower0",false);
-            setupTile(20,"purpleFlower0",false);
-            setupTile(21,"redMushroom0",false);
-            setupTile(22,"smallLilypad0",false);
-            setupTile(23,"smallRock0",true);
-            setupTile(24,"bigRock0",true);
-            setupTile(25,"greyWaterRock0",true);
-            setupTile(26,"brownWaterRock0",true);
-            setupTile(27,"woodSign0",true);
-            setupTile(28,"smallChestClosed0",true);
-            setupTile(29,"smallChestOpened0",true);
+            setupTile(0,"grass0",new Event[]{});
+            setupTile(1,"water0",new Event[]{Event.WATER_COLLISION});
+            setupTile(2,"waterGTL0",new Event[]{Event.WATER_COLLISION});
+            setupTile(3,"waterGTM0",new Event[]{Event.WATER_COLLISION});
+            setupTile(4,"waterGTR0",new Event[]{Event.WATER_COLLISION});
+            setupTile(5,"waterGML0",new Event[]{Event.WATER_COLLISION});
+            setupTile(6,"waterGMR0",new Event[]{Event.WATER_COLLISION});
+            setupTile(7,"waterGBL0",new Event[]{Event.WATER_COLLISION});
+            setupTile(8,"waterGBM0",new Event[]{Event.WATER_COLLISION});
+            setupTile(9,"waterGBR0",new Event[]{Event.WATER_COLLISION});
+            setupTile(10,"waterBLC0",new Event[]{Event.WATER_COLLISION});
+            setupTile(11,"waterTLC0",new Event[]{Event.WATER_COLLISION});
+            setupTile(12,"waterTRC0",new Event[]{Event.WATER_COLLISION});
+            setupTile(13,"waterBRC0",new Event[]{Event.WATER_COLLISION});
+            setupTile(14,"path0",new Event[]{});
+            setupTile(15,"smallAppleTree0",new Event[]{Event.WALL_COLLISION});
+            setupTile(16,"smallGreenTree0",new Event[]{Event.WALL_COLLISION});
+            setupTile(17,"smallBrownTree0",new Event[]{Event.WALL_COLLISION});
+            setupTile(18,"blueFlower0",new Event[]{});
+            setupTile(19,"redFlower0",new Event[]{});
+            setupTile(20,"purpleFlower0",new Event[]{});
+            setupTile(21,"redMushroom0",new Event[]{});
+            setupTile(22,"smallLilypad0",new Event[]{});
+            setupTile(23,"smallRock0",new Event[]{Event.WALL_COLLISION});
+            setupTile(24,"bigRock0",new Event[]{Event.WALL_COLLISION});
+            setupTile(25,"greyWaterRock0",new Event[]{Event.WALL_COLLISION});
+            setupTile(26,"brownWaterRock0",new Event[]{Event.WALL_COLLISION});
+            setupTile(27,"woodSign0",new Event[]{Event.WALL_COLLISION});
+            setupTile(28,"smallChestClosed0",new Event[]{Event.WALL_COLLISION});
+            setupTile(29,"smallChestOpened0",new Event[]{Event.WALL_COLLISION});
         }catch(Exception e){
             System.out.println(e.getMessage());
         }}
-    public void setupTile(int index,String imagePath,boolean collision){
+    public void setupTile(int index,String imagePath,Event[] events){
         UtilityTool uTool = new UtilityTool();
         try{
             tileSet[index] = new Tile();
             tileSet[index].sprite = uTool.scaleImage(ImageIO.read(getClass().getResourceAsStream("/tiles/"+ imagePath + ".png")),panel.tileSize,panel.tileSize);
-            tileSet[index].collision = collision;
+            for(Event event : events){
+                tileSet[index].events.add(event);
+            }
         }catch(IOException e){
             e.printStackTrace();
         }
@@ -143,7 +146,7 @@ public class TileManager {
             return true; // treat out-of-bounds as solid
         if(currentMapTiles[layer][col][row]<0) {return false;}
         else {
-            return tileSet[currentMapTiles[layer][col][row]].collision;
+            return tileSet[currentMapTiles[layer][col][row]].events.contains(Event.WALL_COLLISION) || ((panel.player.events.contains(Event.WATER_COLLISION) && tileSet[currentMapTiles[layer][col][row]].events.contains(Event.WATER_COLLISION)) );
         }
     }
 }

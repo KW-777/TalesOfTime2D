@@ -1,14 +1,18 @@
 package entity;
 
+import main.Event;
 import main.GamePanel;
 import main.KeyHandler;
 import main.UtilityTool;
+import tile.Tile;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Objects;
 import java.util.Random;
 
@@ -18,13 +22,15 @@ public class Player extends Entity {
     boolean movementKeyPressed = false;
 
     public int screenX,screenY;
-
+    int[] facingTiles = new int[5];
+    int tilePosX;
+    int tilePosY;
     public Player(GamePanel panel, KeyHandler kH) {
         this.panel = panel;
         this.kH = kH;
 
         collisionBox = new Rectangle(24, 28, panel.tileSize-42, panel.tileSize-48);
-
+        events = new ArrayList<>();
         setDefaultMovementStats();
         getPlayerImage();
     }
@@ -34,16 +40,38 @@ public class Player extends Entity {
         posY = 10 * panel.tileSize;
         speed = 5 * 60/panel.FPS;
         direction = "down";
+        //Default Collisions
+        events.add(Event.WALL_COLLISION);
+        events.add(Event.WATER_COLLISION);
+
     }
 
     public void update() {
         movementHandler();
+        checkFacingTiles();
         super.collisionHandler(panel);
         spriteHandler();
         updateCamera();
-
     }
 
+    public void checkFacingTiles() {
+        tilePosX = posX / panel.tileSize;
+        tilePosY = posY / panel.tileSize;
+        switch(direction) {
+            case "up" -> tilePosY -= 1;
+            case "down" -> tilePosY += 1;
+            case "left" -> tilePosX -= 1;
+            case "right" -> tilePosX +=  1;
+        }
+        for(int layer=0;layer<4;layer++) { // Only Checks bottom 4 tiles
+            if(tilePosX > 0 &&
+            tilePosY > 0 &&
+            tilePosX < panel.maxWorldCol &&
+            tilePosY < panel.maxWorldRow) {
+            facingTiles[layer] = panel.tm.currentMapTiles[layer][tilePosX][tilePosY];
+        }
+        }
+    }
     public void movementHandler() {
         isMoving = false;
         movementKeyPressed = kH.upPressed || kH.downPressed || kH.leftPressed || kH.rightPressed;
@@ -51,6 +79,7 @@ public class Player extends Entity {
                 lastPosY = posY;
                 direction = "up";
                 posY -= speed;
+
             } else if (kH.downPressed) {
                 lastPosY = posY;
                 direction = "down";
@@ -101,7 +130,7 @@ public class Player extends Entity {
     }
     public void getPlayerImage() {
         try {
-            up = setupSprites("playerUp_0,splayerUp_1,playerUp_2".split(","));
+            up = setupSprites(("playerUp_0,playerUp_1,playerUp_2").split(","));
             down = setupSprites("playerDown_0,playerDown_1,playerDown_2".split(","));
             left = setupSprites("playerLeft_0,playerLeft_1,playerLeft_2".split(","));
             right = setupSprites("playerRight_0,playerRight_1,playerRight_2".split(","));

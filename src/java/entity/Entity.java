@@ -1,9 +1,11 @@
 package entity;
 
+import main.Event;
 import main.GamePanel;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
 
 public class Entity {
     public int posX, posY;
@@ -18,11 +20,10 @@ public class Entity {
     public int spriteNum = 0;
 
     public Rectangle collisionBox;
-    public boolean collisionOn;
-
+    public boolean collisionOn = false;
+    public ArrayList<Event> events;
     public void collisionHandler(GamePanel panel) {
-        collisionOn = false;
-        panel.cHandler.checkTile(this);
+        panel.cHandler.checkTileCollision(this);
         if(collisionOn && isMoving) {
             switch (direction) {
                case "up","down" -> posY = lastPosY;

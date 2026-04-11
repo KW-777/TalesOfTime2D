@@ -17,17 +17,23 @@ public class GamePanel extends JPanel implements Runnable {
     public final int screenHeight = tileSize * maxScreenRow; // Default: 768px
 
     //World Settings
-    public final int maxWorldCol = 64; // Max World Y - Tiles
-    public final int maxWorldRow = 64; // Max World X - Tiles
+    public final int maxWorldCol = 96; // Max World Y - Tiles
+    public final int maxWorldRow = 96; // Max World X - Tiles
 
     // Game Objects
     Thread gameThread;
-    KeyHandler keyH = new KeyHandler();
+    KeyHandler keyH = new KeyHandler(this);
     public TileManager tm = new TileManager(this);
     public CollisionHandler cHandler = new CollisionHandler(this);
-
+    public UI ui;
     //Player
     public Player player = new Player(this,keyH);
+
+    //Game State
+    public int gameState;
+    public final int titleState = 0;
+    public final int playState = 1;
+    public final int pauseState = 2;
 
     public final int FPS = 30;
     public boolean debugOn = false;
@@ -38,14 +44,17 @@ public class GamePanel extends JPanel implements Runnable {
         this.setDoubleBuffered(true);
         this.addKeyListener(keyH);
         this.setFocusable(true);
+        ui = new UI(this);
+        setupGame();
     }
     public void startGameThread() {
         gameThread = new Thread(this);
         gameThread.start();
     }
-    public void checkInputState() {
-        debugOn = keyH.setDebug;
+    public void setupGame() {
+        gameState = titleState;
     }
+
     @Override
     public void run() {
         // FPS limiter, Main Game loop
@@ -78,17 +87,22 @@ public class GamePanel extends JPanel implements Runnable {
     }
     public void update() {
         // Update Object States
-        player.update();
-        checkInputState();
+        if(gameState == playState) {
+            player.update();
+        }
+        if(gameState == pauseState) {}
+        if(gameState == titleState) {}
     }
     public void paintComponent(Graphics g) {
         // Draw the screen
         long drawStart = System.nanoTime();
         super.paintComponent(g);
         Graphics2D g2d = (Graphics2D)g;
-        tm.draw(g2d);
-        player.draw(g2d);
-
+        if(gameState == playState) {
+            tm.draw(g2d);
+            player.draw(g2d);
+        }
+            ui.draw(g2d);
         if(debugOn) {
             //Debug Draw Time
             long passed = System.nanoTime() - drawStart;

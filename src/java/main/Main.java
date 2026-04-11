@@ -3,7 +3,7 @@ package main;
 import javax.swing.*;
 
 public class Main {
-    public static String VERSION = "v0.1.0";
+    public static String VERSION = "v0.2.2";
     public static void main(String[] args) {
 
         JFrame window = new JFrame();
