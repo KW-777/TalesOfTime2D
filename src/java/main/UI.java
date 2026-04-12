@@ -52,6 +52,7 @@ public class UI {
         }
     }
     private void drawPauseScreen(Graphics2D g2d) {
+        panel.keyH.resetInput();
         g2d.drawImage(pauseBackground, 0, 0, null);
         drawTitleText(g2d);
         g2d.setFont(subtitleFont);
@@ -74,6 +75,7 @@ public class UI {
         }
     }
     private void drawTitleScreen(Graphics2D g2d) {
+        panel.keyH.resetInput();
         g2d.drawImage(pauseBackground, 0, 0, null);
         drawTitleText(g2d);
         //Menu
@@ -104,7 +106,6 @@ public class UI {
     private void pauseSave() {} //To-Do
     private void titleStart() {
         panel.gameState = panel.playState;
-
     }
     private void titleLoad() {}
     private void titleCredits() {}

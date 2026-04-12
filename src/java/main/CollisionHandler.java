@@ -1,6 +1,8 @@
 package main;
 
 import entity.Entity;
+import entity.Player;
+import object.OBJ_Base;
 
 public class CollisionHandler {
 
@@ -71,5 +73,16 @@ public class CollisionHandler {
                 }
             }
         }
-    }}
+    }
+    public void checkObjectCollision(Player player) {
+        for(OBJ_Base obj: panel.objects) {
+            if(obj != null &&
+                    (obj.worldX/panel.tileSize == player.facingTiles[0] || obj.worldX/panel.tileSize == player.facingTiles[2])
+                    && (obj.worldY/panel.tileSize == player.facingTiles[1] || obj.worldX/panel.tileSize == player.facingTiles[3]) &&
+                    panel.keyH.interactPressed) {
+                obj.interact(panel.evH,player);
+                }
+            }
+        }
+    }
 

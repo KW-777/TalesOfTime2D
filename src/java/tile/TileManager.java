@@ -1,6 +1,5 @@
 package tile;
 
-import jdk.jshell.execution.Util;
 import main.Event;
 import main.GamePanel;
 import main.UtilityTool;
@@ -12,6 +11,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Collections;
 
 public class TileManager {
     GamePanel panel;
@@ -48,7 +48,7 @@ public class TileManager {
             setupTile(12,"waterTRC0",new Event[]{Event.WATER_COLLISION});
             setupTile(13,"waterBRC0",new Event[]{Event.WATER_COLLISION});
             setupTile(14,"path0",new Event[]{});
-            setupTile(15,"smallAppleTree0",new Event[]{Event.WALL_COLLISION});
+            setupTile(15,"/objects/smallAppleTree0",new Event[]{Event.WALL_COLLISION,Event.appleTreeInteraction});
             setupTile(16,"smallGreenTree0",new Event[]{Event.WALL_COLLISION});
             setupTile(17,"smallBrownTree0",new Event[]{Event.WALL_COLLISION});
             setupTile(18,"blueFlower0",new Event[]{});
@@ -59,10 +59,10 @@ public class TileManager {
             setupTile(23,"smallRock0",new Event[]{Event.WALL_COLLISION});
             setupTile(24,"bigRock0",new Event[]{Event.WALL_COLLISION});
             setupTile(25,"greyWaterRock0",new Event[]{Event.WALL_COLLISION});
-            setupTile(26,"brownWaterRock0",new Event[]{Event.WALL_COLLISION});
-            setupTile(27,"woodSign0",new Event[]{Event.WALL_COLLISION});
-            setupTile(28,"smallChestClosed0",new Event[]{Event.WALL_COLLISION});
-            setupTile(29,"smallChestOpened0",new Event[]{Event.WALL_COLLISION});
+            setupTile(26,"BrownWaterRock0",new Event[]{Event.WALL_COLLISION});
+            setupTile(27,"/objects/woodSign0",new Event[]{Event.WALL_COLLISION});
+            setupTile(28,"/objects/smallChestClosed0",new Event[]{Event.WALL_COLLISION});
+            setupTile(29,"/objects/smallChestOpened0",new Event[]{Event.WALL_COLLISION});
         }catch(Exception e){
             System.out.println(e.getMessage());
         }}
@@ -70,10 +70,13 @@ public class TileManager {
         UtilityTool uTool = new UtilityTool();
         try{
             tileSet[index] = new Tile();
-            tileSet[index].sprite = uTool.scaleImage(ImageIO.read(getClass().getResourceAsStream("/tiles/"+ imagePath + ".png")),panel.tileSize,panel.tileSize);
-            for(Event event : events){
-                tileSet[index].events.add(event);
+            if(imagePath.substring(0,1).equals("/")) {
+                tileSet[index].sprite = uTool.scaleImage(ImageIO.read(getClass().getResourceAsStream(imagePath + ".png")), panel.tileSize, panel.tileSize);
+            }else{
+                tileSet[index].sprite = uTool.scaleImage(ImageIO.read(getClass().getResourceAsStream("/tiles/" + imagePath + ".png")), panel.tileSize, panel.tileSize);
             }
+            Collections.addAll(tileSet[index].events, events);
+
         }catch(IOException e){
             e.printStackTrace();
         }
@@ -81,7 +84,7 @@ public class TileManager {
     public void draw(Graphics2D g2d) {
         int worldRow = 0;
         int worldCol = 0;
-        int tileNum = 0;
+        int tileNum;
         while (worldCol < currentWorldCols && worldRow < currentWorldRows) {
             try {
 

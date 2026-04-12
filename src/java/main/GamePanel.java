@@ -1,6 +1,8 @@
 package main;
 
 import entity.Player;
+import object.OBJ_Base;
+import object.obj_Chest;
 import tile.TileManager;
 
 import javax.swing.*;
@@ -25,6 +27,8 @@ public class GamePanel extends JPanel implements Runnable {
     KeyHandler keyH = new KeyHandler(this);
     public TileManager tm = new TileManager(this);
     public CollisionHandler cHandler = new CollisionHandler(this);
+    public OBJ_Base[] objects = new  OBJ_Base[16];
+    public EventHandler evH = new EventHandler(this);
     public UI ui;
     //Player
     public Player player = new Player(this,keyH);
@@ -52,9 +56,20 @@ public class GamePanel extends JPanel implements Runnable {
         gameThread.start();
     }
     public void setupGame() {
+        setObjects();
         gameState = titleState;
     }
-
+    public void setObjects() {
+        objects[0] = new obj_Chest();
+        objects[0].worldX = 59*tileSize;
+        objects[0].worldY = 31*tileSize;
+    }
+    public void drawObjects(Graphics2D g2d) {
+        for(OBJ_Base obj : objects) {
+            if(obj != null) {
+            obj.draw(g2d,this);
+        }}
+    }
     @Override
     public void run() {
         // FPS limiter, Main Game loop
@@ -100,6 +115,7 @@ public class GamePanel extends JPanel implements Runnable {
         Graphics2D g2d = (Graphics2D)g;
         if(gameState == playState) {
             tm.draw(g2d);
+            drawObjects(g2d);
             player.draw(g2d);
         }
             ui.draw(g2d);

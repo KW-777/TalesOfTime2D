@@ -5,13 +5,15 @@ import java.awt.event.KeyListener;
 import java.util.HashMap;
 
 public class KeyHandler implements KeyListener {
-    public boolean upPressed,downPressed,leftPressed,rightPressed = false;
+    public boolean upPressed,downPressed,leftPressed,rightPressed,interactPressed = false;
     public boolean setDebug = false;
     GamePanel panel;
     public KeyHandler(GamePanel panel) {
         this.panel = panel;
     }
-    @Override
+    public void resetInput() {
+        upPressed = false;downPressed = false;leftPressed = false;rightPressed= false;interactPressed = false;
+    }
     public void keyTyped(KeyEvent e) {}
 
     @Override
@@ -30,6 +32,9 @@ public class KeyHandler implements KeyListener {
                 }
                 case KeyEvent.VK_D -> {
                     rightPressed = true;
+                }
+                case KeyEvent.VK_E -> {
+                    interactPressed = true;
                 }
                 case KeyEvent.VK_BRACELEFT -> {
                     panel.debugOn = !panel.debugOn;
@@ -66,6 +71,9 @@ public class KeyHandler implements KeyListener {
                     break;
                 case KeyEvent.VK_D:
                     rightPressed = false;
+                    break;
+                case KeyEvent.VK_E:
+                    interactPressed = false;
                     break;
             }
         }

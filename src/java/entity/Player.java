@@ -16,13 +16,16 @@ import java.util.Arrays;
 import java.util.Objects;
 import java.util.Random;
 
+import static java.lang.Math.floor;
+import static java.lang.Math.round;
+
 public class Player extends Entity {
     GamePanel panel;
     KeyHandler kH;
     boolean movementKeyPressed = false;
-
+    public int apples = 0;
     public int screenX,screenY;
-    int[] facingTiles = new int[5];
+    public int[] facingTiles = new int[4];
     int tilePosX;
     int tilePosY;
     public Player(GamePanel panel, KeyHandler kH) {
@@ -49,27 +52,38 @@ public class Player extends Entity {
     public void update() {
         movementHandler();
         checkFacingTiles();
+        panel.cHandler.checkObjectCollision(this);
+        if(kH.interactPressed) {
+            panel.evH.executeTileEvents(1,facingTiles[0],facingTiles[1],this);
+            panel.evH.executeTileEvents(1,facingTiles[2],facingTiles[3],this);
+        }
         super.collisionHandler(panel);
         spriteHandler();
         updateCamera();
     }
 
     public void checkFacingTiles() {
-        tilePosX = posX / panel.tileSize;
-        tilePosY = posY / panel.tileSize;
+        tilePosX = (posX)/panel.tileSize;
+        tilePosY = (posY)/ panel.tileSize;
+        int offsetX = posX%panel.tileSize;
+        int offsetY = posY%panel.tileSize;
         switch(direction) {
-            case "up" -> tilePosY -= 1;
-            case "down" -> tilePosY += 1;
-            case "left" -> tilePosX -= 1;
-            case "right" -> tilePosX +=  1;
-        }
-        for(int layer=0;layer<4;layer++) { // Only Checks bottom 4 tiles
-            if(tilePosX > 0 &&
-            tilePosY > 0 &&
-            tilePosX < panel.maxWorldCol &&
-            tilePosY < panel.maxWorldRow) {
-            facingTiles[layer] = panel.tm.currentMapTiles[layer][tilePosX][tilePosY];
-        }
+            case "up","down" -> {
+                int dir = direction.equals("up") ? 0:1;
+                int side =(offsetX > panel.tileSize / 2) ? 1:-1;
+                facingTiles[0] = tilePosX;
+                facingTiles[1] = tilePosY + dir;
+                facingTiles[2] = tilePosX + side;
+                facingTiles[3] = tilePosY + dir;
+            }
+            case "left","right"-> {
+                int dir = direction.equals("left") ? -1 : 1;
+                int side = (offsetY > panel.tileSize / 2) ? 1 : -1;
+                facingTiles[0] = tilePosX + dir;
+                facingTiles[1] = tilePosY;
+                facingTiles[2] = tilePosX + dir;
+                facingTiles[3] = tilePosY + side;
+            }
         }
     }
     public void movementHandler() {
