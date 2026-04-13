@@ -19,60 +19,25 @@ public class CollisionHandler {
         int entityTWY = entity.posY + entity.collisionBox.y;
         int entityBWY = entity.posY + entity.collisionBox.y + entity.collisionBox.height;
 
+        int checkRadius = entity.isMoving ? entity.speed : 0;
 
-        int entityLeftCol = entityLWX / panel.tileSize;
-        int entityRightCol = entityRWX / panel.tileSize;
-        int entityTopRow = entityTWY / panel.tileSize;
-        int entityBottomRow = entityBWY / panel.tileSize;
-
-        int checkRadius = entity.isMoving ? entity.speed :0;
-
-        switch (entity.direction) {
-            case "up" -> {
-                entityTopRow = (entityTWY - checkRadius) / panel.tileSize;
-                for (int col = entityLeftCol; col <= entityRightCol; col++) {
-                    for(int layer = 0; layer < panel.tm.currentWorldLayers; layer++) {
-                        if(panel.tm.isSolid(layer,col,entityTopRow)) {
-                            entity.collisionOn = true;
-                            break;
-                        }
-                    }
-                }
-            }
-            case "down" -> {
-                entityBottomRow = (entityBWY + checkRadius) / panel.tileSize;
-                for (int col = entityLeftCol; col <= entityRightCol; col++) {
-                    for(int layer = 0; layer < panel.tm.currentWorldLayers; layer++) {
-                        if (panel.tm.isSolid(layer, col, entityBottomRow)) {
-                            entity.collisionOn = true;
-                            break;
-                        }
-                    }
-                }
-            }
-            case "left" -> {
-                entityLeftCol = (entityLWX - checkRadius) / panel.tileSize;
-                for (int row = entityTopRow; row <= entityBottomRow; row++) {
-                    for(int layer = 0; layer < panel.tm.currentWorldLayers; layer++) {
-                        if (panel.tm.isSolid(layer, entityLeftCol,row)) {
-                            entity.collisionOn = true;
-                            break;
-                        }
-                    }
-                }
-            }
-            case "right" -> {
-                entityRightCol = (entityRWX + checkRadius) / panel.tileSize;
-                for (int row = entityTopRow; row <= entityBottomRow; row++) {
-                    for(int layer = 0; layer < panel.tm.currentWorldLayers; layer++) {
-                        if (panel.tm.isSolid(layer,entityRightCol,row)) {
-                            entity.collisionOn = true;
-                            break;
-                        }
-                    }
+        int[][] corners = {
+                {entityLWX, entityTWY}, // TL
+                {entityRWX, entityTWY}, //TR
+                {entityRWX, entityBWY},
+                {entityLWX, entityBWY},
+        };
+        for(int[] corner: corners){
+            int col = corner[0]/panel.tileSize;
+            int row = corner[1]/panel.tileSize;
+            for(int layer = 0;layer<panel.tm.currentWorldLayers;layer++){
+                if(panel.tm.isSolid(layer,col,row)) {
+                    entity.collisionOn = true;
+                    return;
                 }
             }
         }
+
     }
     public void checkObjectCollision(Player player) {
         for(OBJ_Base obj: panel.objects) {

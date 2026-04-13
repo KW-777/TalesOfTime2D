@@ -1,33 +1,34 @@
 package entity;
 
-import main.Event;
+import event.Event;
+import event.WallCollisionEvent;
+import event.WaterCollisionEvent;
 import main.GamePanel;
 import main.KeyHandler;
 import main.UtilityTool;
-import tile.Tile;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Objects;
-import java.util.Random;
 
-import static java.lang.Math.floor;
 import static java.lang.Math.round;
 
 public class Player extends Entity {
     GamePanel panel;
     KeyHandler kH;
     boolean movementKeyPressed = false;
-    public int apples = 0;
     public int screenX,screenY;
     public int[] facingTiles = new int[4];
     int tilePosX;
     int tilePosY;
+
+    int stamina = 100;
+    public int apples;
+    public boolean isSprinting = false;
+
     public Player(GamePanel panel, KeyHandler kH) {
         this.panel = panel;
         this.kH = kH;
@@ -44,8 +45,8 @@ public class Player extends Entity {
         speed = 5 * 60/panel.FPS;
         direction = "down";
         //Default Collisions
-        events.add(Event.WALL_COLLISION);
-        events.add(Event.WATER_COLLISION);
+        events.add(new WallCollisionEvent());
+        events.add(new WaterCollisionEvent());
 
     }
 
@@ -57,11 +58,11 @@ public class Player extends Entity {
             panel.evH.executeTileEvents(1,facingTiles[0],facingTiles[1],this);
             panel.evH.executeTileEvents(1,facingTiles[2],facingTiles[3],this);
         }
+        staminaCheck();
         super.collisionHandler(panel);
         spriteHandler();
         updateCamera();
     }
-
     public void checkFacingTiles() {
         tilePosX = (posX)/panel.tileSize;
         tilePosY = (posY)/ panel.tileSize;
@@ -87,27 +88,28 @@ public class Player extends Entity {
         }
     }
     public void movementHandler() {
-        isMoving = false;
         movementKeyPressed = kH.upPressed || kH.downPressed || kH.leftPressed || kH.rightPressed;
-            if (kH.upPressed) {
-                lastPosY = posY;
-                direction = "up";
-                posY -= speed;
+        isMoving = movementKeyPressed;
+        int x = 0,y=0;
+        if (movementKeyPressed) {
+            if (kH.upPressed) y -=1;
+            if (kH.downPressed) y +=1;
+            if (kH.leftPressed) x -=1;
+            if (kH.rightPressed) x+=1;
+        double speed = this.speed;
+        if(x !=0 && y !=0) {
+            speed = speed / Math.sqrt(2);
+        }
+        lastPosX = posX;
+        lastPosY = posY;
+        posX += (int)(x * speed);
+        posY += (int)(y * speed);
+        if(x<0) direction = "left";
+        else if(x>0) direction = "right";
+        else if(y<0) direction = "up";
+        else if(y>0) direction = "down";
+        }
 
-            } else if (kH.downPressed) {
-                lastPosY = posY;
-                direction = "down";
-                posY += speed;
-            } else if (kH.leftPressed) {
-                lastPosX = posX;
-                direction = "left";
-                posX -= speed;
-            } else if (kH.rightPressed) {
-                lastPosX = posX;
-                direction = "right";
-                posX += speed;
-            }
-            isMoving = true;
     }
     public void spriteHandler() {
             if (movementKeyPressed) {
@@ -115,7 +117,7 @@ public class Player extends Entity {
             } else {
                 spriteNum = 0;
             }
-            if (spriteCounter > (panel.FPS / 30) * 8) {
+            if (spriteCounter > (panel.FPS / 30*speed)) {
                 spriteCounter = 0;
                 if (spriteNum >= down.length - 1) {
                     spriteNum = 0;
@@ -123,7 +125,19 @@ public class Player extends Entity {
                     spriteNum++;
                 }
             }
+
+    }public void sprintOn() {
+        if(!isSprinting) {
+            isSprinting = true;
+            speed += 3;
+        }
+    }public void sprintOff() {
+        if(isSprinting) {
+            speed -= 3;
+            isSprinting = false;
+        }
     }
+    public void staminaCheck() {}
     public void updateCamera() {
         int worldWidth = panel.tm.currentWorldCols * panel.tileSize;
         int worldHeight = panel.tm.currentWorldRows * panel.tileSize;
@@ -131,14 +145,14 @@ public class Player extends Entity {
         screenX = panel.screenWidth/2 - (panel.tileSize/2);
         screenY = panel.screenHeight/2 - (panel.tileSize/2);
         // Lock the screen if near border
-        if(posX < panel.screenWidth/2) {
+        if(posX-panel.tileSize/8 < panel.screenWidth/2) {
             screenX = posX;
         }
-        if(posX > worldWidth-panel.screenWidth/2) {
+        if(posX+panel.tileSize/8 > worldWidth-panel.screenWidth/2) {
             screenX = panel.screenWidth - (worldWidth-posX);
-        }if(posY < panel.screenHeight/2) {
+        }if(posY-panel.tileSize/8 < panel.screenHeight/2) {
             screenY = posY;
-        }if(posY > worldHeight-panel.screenHeight/2) {
+        }if(posY+panel.tileSize/8 > worldHeight-panel.screenHeight/2) {
             screenY = panel.screenHeight - (worldHeight-posY);
         }
     }

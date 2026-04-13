@@ -2,8 +2,10 @@ package main;
 
 import entity.Entity;
 import entity.Player;
-import event.appleTreeInteraction;
-import object.OBJ_Base;
+import event.EntityEvent;
+import event.Event;
+import event.AppleTreeInteraction;
+import event.TileEvent;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -11,7 +13,7 @@ import java.util.Collections;
 public class EventHandler {
     ArrayList<Event> applicableEvents = new ArrayList<>();
     GamePanel panel;
-    public appleTreeInteraction appleTreeInteraction;
+    public AppleTreeInteraction appleTreeInteraction;
 
     public EventHandler(GamePanel panel) {
         this.panel = panel;
@@ -24,15 +26,17 @@ public class EventHandler {
     public void checkPlayerEvents(Player player) {
         for(int i=0;i<panel.tm.currentWorldLayers;i++) {
             executeTileEvents(i,player.facingTiles[0], player.facingTiles[1],player);
-            }
+        }
         executeEntityEvents(player);
     }
-    public boolean hasEvent(Event event) {
-        return applicableEvents.contains(event);
+    public boolean hasEvent(ArrayList<Event> events,String EventName) {
+        return events.stream().anyMatch(e -> e.getName().equals(EventName));
     }
     public void executeEntityEvents(Entity entity) {
         for (Event event : entity.events) {
-            event.on(this,entity);
+            if(event instanceof EntityEvent) {
+                ((EntityEvent)event).on(this, entity);
+            }
         }
     }
     public void executeTileEvents(int layer, int col, int row, Player player) {
@@ -40,25 +44,20 @@ public class EventHandler {
         if(col >= 0 && row >= 0 && layer >= 0) {
             try {
                 for(Event event:panel.tm.tileSet[panel.tm.currentMapTiles[layer][col][row]].events) {
-                    event.on(this,col,row,player);
+                    if(event instanceof TileEvent) {
+                        ((TileEvent)event).on(this, col, row, player);
                     }
+                }
             }catch(ArrayIndexOutOfBoundsException e) {
             }
         }
     }
-    public void removeEvent(Event event, Entity entity) {
+    public void removeEntityEvent(EntityEvent event, Entity entity) {
         applicableEvents.remove(event);
         event.off(this,entity);
     }
-    public void waterCollisionOn(Entity entity) {
-        entity.collisionOn = true;
-    }
-    public void waterCollisionOff(Entity entity) {
-        entity.collisionOn = false;
-    }
-
     private void initEvents() {
-        appleTreeInteraction = new appleTreeInteraction(panel);
+        appleTreeInteraction = new AppleTreeInteraction(panel);
     }
 
     // Unimplemented

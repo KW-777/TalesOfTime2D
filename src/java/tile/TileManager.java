@@ -1,6 +1,9 @@
 package tile;
 
-import main.Event;
+import event.AppleTreeInteraction;
+import event.Event;
+import event.WallCollisionEvent;
+import event.WaterCollisionEvent;
 import main.GamePanel;
 import main.UtilityTool;
 
@@ -34,35 +37,35 @@ public class TileManager {
     public void getTileImage() {
         try {
             setupTile(0,"grass0",new Event[]{});
-            setupTile(1,"water0",new Event[]{Event.WATER_COLLISION});
-            setupTile(2,"waterGTL0",new Event[]{Event.WATER_COLLISION});
-            setupTile(3,"waterGTM0",new Event[]{Event.WATER_COLLISION});
-            setupTile(4,"waterGTR0",new Event[]{Event.WATER_COLLISION});
-            setupTile(5,"waterGML0",new Event[]{Event.WATER_COLLISION});
-            setupTile(6,"waterGMR0",new Event[]{Event.WATER_COLLISION});
-            setupTile(7,"waterGBL0",new Event[]{Event.WATER_COLLISION});
-            setupTile(8,"waterGBM0",new Event[]{Event.WATER_COLLISION});
-            setupTile(9,"waterGBR0",new Event[]{Event.WATER_COLLISION});
-            setupTile(10,"waterBLC0",new Event[]{Event.WATER_COLLISION});
-            setupTile(11,"waterTLC0",new Event[]{Event.WATER_COLLISION});
-            setupTile(12,"waterTRC0",new Event[]{Event.WATER_COLLISION});
-            setupTile(13,"waterBRC0",new Event[]{Event.WATER_COLLISION});
+            setupTile(1,"water0",new Event[]{new WaterCollisionEvent()});
+            setupTile(2,"waterGTL0",new Event[]{new WaterCollisionEvent()});
+            setupTile(3,"waterGTM0",new Event[]{new WaterCollisionEvent()});
+            setupTile(4,"waterGTR0",new Event[]{new WaterCollisionEvent()});
+            setupTile(5,"waterGML0",new Event[]{new WaterCollisionEvent()});
+            setupTile(6,"waterGMR0",new Event[]{new WaterCollisionEvent()});
+            setupTile(7,"waterGBL0",new Event[]{new WaterCollisionEvent()});
+            setupTile(8,"waterGBM0",new Event[]{new WaterCollisionEvent()});
+            setupTile(9,"waterGBR0",new Event[]{new WaterCollisionEvent()});
+            setupTile(10,"waterBLC0",new Event[]{new WaterCollisionEvent()});
+            setupTile(11,"waterTLC0",new Event[]{new WaterCollisionEvent()});
+            setupTile(12,"waterTRC0",new Event[]{new WaterCollisionEvent()});
+            setupTile(13,"waterBRC0",new Event[]{new WaterCollisionEvent()});
             setupTile(14,"path0",new Event[]{});
-            setupTile(15,"/objects/smallAppleTree0",new Event[]{Event.WALL_COLLISION,Event.appleTreeInteraction});
-            setupTile(16,"smallGreenTree0",new Event[]{Event.WALL_COLLISION});
-            setupTile(17,"smallBrownTree0",new Event[]{Event.WALL_COLLISION});
+            setupTile(15,"/objects/smallAppleTree0",new Event[]{new WallCollisionEvent(),new AppleTreeInteraction(panel)});
+            setupTile(16,"smallGreenTree0",new Event[]{new WallCollisionEvent()});
+            setupTile(17,"smallBrownTree0",new Event[]{new WallCollisionEvent()});
             setupTile(18,"blueFlower0",new Event[]{});
             setupTile(19,"redFlower0",new Event[]{});
             setupTile(20,"purpleFlower0",new Event[]{});
             setupTile(21,"redMushroom0",new Event[]{});
             setupTile(22,"smallLilypad0",new Event[]{});
-            setupTile(23,"smallRock0",new Event[]{Event.WALL_COLLISION});
-            setupTile(24,"bigRock0",new Event[]{Event.WALL_COLLISION});
-            setupTile(25,"greyWaterRock0",new Event[]{Event.WALL_COLLISION});
-            setupTile(26,"BrownWaterRock0",new Event[]{Event.WALL_COLLISION});
-            setupTile(27,"/objects/woodSign0",new Event[]{Event.WALL_COLLISION});
-            setupTile(28,"/objects/smallChestClosed0",new Event[]{Event.WALL_COLLISION});
-            setupTile(29,"/objects/smallChestOpened0",new Event[]{Event.WALL_COLLISION});
+            setupTile(23,"smallRock0",new Event[]{new WallCollisionEvent()});
+            setupTile(24,"bigRock0",new Event[]{new WallCollisionEvent()});
+            setupTile(25,"greyWaterRock0",new Event[]{new WallCollisionEvent()});
+            setupTile(26,"BrownWaterRock0",new Event[]{new WallCollisionEvent()});
+            setupTile(27,"/objects/woodSign0",new Event[]{new WallCollisionEvent()});
+            setupTile(28,"/objects/smallChestClosed0",new Event[]{new WallCollisionEvent()});
+            setupTile(29,"/objects/smallChestOpened0",new Event[]{new WallCollisionEvent()});
         }catch(Exception e){
             System.out.println(e.getMessage());
         }}
@@ -149,7 +152,7 @@ public class TileManager {
             return true; // treat out-of-bounds as solid
         if(currentMapTiles[layer][col][row]<0) {return false;}
         else {
-            return tileSet[currentMapTiles[layer][col][row]].events.contains(Event.WALL_COLLISION) || ((panel.player.events.contains(Event.WATER_COLLISION) && tileSet[currentMapTiles[layer][col][row]].events.contains(Event.WATER_COLLISION)) );
+            return (panel.evH.hasEvent(tileSet[currentMapTiles[layer][col][row]].events,WallCollisionEvent.NAME) || (panel.evH.hasEvent(tileSet[currentMapTiles[layer][col][row]].events,WaterCollisionEvent.NAME) && panel.evH.hasEvent(panel.player.events,WaterCollisionEvent.NAME)));
         }
     }
 }

@@ -1,6 +1,6 @@
 package entity;
 
-import main.Event;
+import event.Event;
 import main.GamePanel;
 
 import java.awt.*;
@@ -24,11 +24,20 @@ public class Entity {
     public ArrayList<Event> events;
     public void collisionHandler(GamePanel panel) {
         panel.cHandler.checkTileCollision(this);
-        if(collisionOn && isMoving) {
-            switch (direction) {
-               case "up","down" -> posY = lastPosY;
-               case "left","right" -> posX = lastPosX;
-            }
+        if(!isMoving) return;
+        int savedY = posY;
+        posY = lastPosY;
+        panel.cHandler.checkTileCollision(this);
+        if(collisionOn) {
+            posX = lastPosX;
         }
+        posY = savedY;
+        int savedX = posX;
+        posX = lastPosX;
+        panel.cHandler.checkTileCollision(this);
+        if(collisionOn) {
+            posY = lastPosY;
+        }
+        posX = savedX;
     }
 }

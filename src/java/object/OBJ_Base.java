@@ -1,7 +1,7 @@
 package object;
 
 import entity.Player;
-import main.Event;
+import event.Event;
 import main.EventHandler;
 import main.GamePanel;
 import main.UtilityTool;

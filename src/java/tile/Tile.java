@@ -1,6 +1,6 @@
 package tile;
 
-import main.Event;
+import event.Event;
 
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;

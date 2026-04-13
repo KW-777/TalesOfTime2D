@@ -61,8 +61,8 @@ public class GamePanel extends JPanel implements Runnable {
     }
     public void setObjects() {
         objects[0] = new obj_Chest();
-        objects[0].worldX = 59*tileSize;
-        objects[0].worldY = 31*tileSize;
+        objects[0].worldX = 60*tileSize;
+        objects[0].worldY = 35*tileSize;
     }
     public void drawObjects(Graphics2D g2d) {
         for(OBJ_Base obj : objects) {

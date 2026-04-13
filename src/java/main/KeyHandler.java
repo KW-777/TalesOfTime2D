@@ -20,30 +20,26 @@ public class KeyHandler implements KeyListener {
     public void keyPressed(KeyEvent e) {
         int code = e.getKeyCode();
         if(panel.gameState == panel.playState) {
-            switch(code) {
-                case (KeyEvent.VK_W) -> {
+                if(code == KeyEvent.VK_W) {
                     upPressed = true;
-                }
-                case KeyEvent.VK_S -> {
+                }if(code == KeyEvent.VK_S){
                     downPressed = true;
-                }
-                case KeyEvent.VK_A -> {
+                }if(code == KeyEvent.VK_A) {
                     leftPressed = true;
-                }
-                case KeyEvent.VK_D -> {
+                }if(code ==KeyEvent.VK_D) {
                     rightPressed = true;
-                }
-                case KeyEvent.VK_E -> {
+                }if(code == KeyEvent.VK_E) {
                     interactPressed = true;
                 }
-                case KeyEvent.VK_BRACELEFT -> {
-                    panel.debugOn = !panel.debugOn;
+                if(code == KeyEvent.VK_SHIFT) {
+                    panel.player.sprintOn();
                 }
-                case KeyEvent.VK_ESCAPE -> {
+                if(code == KeyEvent.VK_BACK_SLASH) {
+                    panel.debugOn = !panel.debugOn;
+                }if( code == KeyEvent.VK_ESCAPE) {
                     panel.gameState = panel.pauseState;
                 }
-            }
-        }else if(panel.gameState == panel.pauseState) {
+            }else if(panel.gameState == panel.pauseState) {
             switch (code) {
                 case KeyEvent.VK_ESCAPE -> {
                     panel.gameState = panel.playState;
@@ -59,22 +55,18 @@ public class KeyHandler implements KeyListener {
     public void keyReleased(KeyEvent e) {
         int code = e.getKeyCode();
         if(panel.gameState == panel.playState) {
-            switch(code) {
-                case KeyEvent.VK_W:
-                    upPressed = false;
-                    break;
-                case KeyEvent.VK_S:
-                    downPressed = false;
-                break;
-                case KeyEvent.VK_A:
-                    leftPressed = false;
-                    break;
-                case KeyEvent.VK_D:
-                    rightPressed = false;
-                    break;
-                case KeyEvent.VK_E:
-                    interactPressed = false;
-                    break;
+            if(code == KeyEvent.VK_W) {
+                upPressed = false;
+            }if(code == KeyEvent.VK_S){
+                downPressed = false;
+            }if(code == KeyEvent.VK_A) {
+                leftPressed = false;
+            }if(code ==KeyEvent.VK_D) {
+                rightPressed = false;
+            }if(code == KeyEvent.VK_E) {
+                interactPressed = false;
+            }if(code == KeyEvent.VK_SHIFT) {
+                panel.player.sprintOff();
             }
         }
     }

@@ -42,6 +42,7 @@ public class UI {
             g2d.drawString(Main.VERSION,panel.screenWidth-round(1.25*panel.tileSize), panel.tileSize/2);
         }
     }
+
     public void initResources() {
         try {
             GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
@@ -53,6 +54,9 @@ public class UI {
     }
     private void drawPauseScreen(Graphics2D g2d) {
         panel.keyH.resetInput();
+        if(panel.player.isSprinting) {
+            panel.player.sprintOff();
+        }
         g2d.drawImage(pauseBackground, 0, 0, null);
         drawTitleText(g2d);
         g2d.setFont(subtitleFont);
